@@ -1,5 +1,4 @@
-﻿using FluentValidation;
-using UnistreamTask.Application.Exceptions;
+﻿using UnistreamTask.Application.Exceptions;
 
 namespace UnistreamTask.WebApi.Middlewares;
 
@@ -30,9 +29,9 @@ public class ExceptionsLoggingMiddlware
             context.Response.StatusCode = StatusCodes.Status409Conflict;
             await WriteAndLogException(exception, context);
         }
-        catch (ValidationException exception)
+        catch (StorageOverfullException exception)
         {
-            context.Response.StatusCode = StatusCodes.Status400BadRequest;
+            context.Response.StatusCode = StatusCodes.Status507InsufficientStorage;
             await WriteAndLogException(exception, context);
         }
     }

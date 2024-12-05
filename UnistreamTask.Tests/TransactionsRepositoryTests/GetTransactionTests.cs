@@ -17,7 +17,9 @@ public class GetTransactionTests : IDisposable
 
     public GetTransactionTests()
     {
-        _dbContext = new InMemoryDbContext(new DbContextOptions<InMemoryDbContext>());
+        var dbContextOptions = new DbContextOptionsBuilder<InMemoryDbContext>()
+            .UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
+        _dbContext = new InMemoryDbContext(dbContextOptions);
         var createTransactionParamsValidatorMock = new Mock<IValidator<CreateTransactionParams>>();
         _transactionsRepository = new TransactionsRepository(_dbContext, createTransactionParamsValidatorMock.Object);
     }
@@ -55,8 +57,8 @@ public class GetTransactionTests : IDisposable
         await getTransactionAction.Should().ThrowAsync<NotExistedEntityException>();
     }
 
-    public async void Dispose()
+    public void Dispose()
     {
-        await _dbContext.DisposeAsync();
+        _dbContext.Dispose();
     }
 }

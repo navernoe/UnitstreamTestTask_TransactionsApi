@@ -26,7 +26,9 @@ public class CreateTransactionTests : IDisposable
         };
         var appSettingsOptsMock = new Mock<IOptionsSnapshot<AppSettings>>();
         appSettingsOptsMock.Setup(m => m.Value).Returns(appSettings);
-        _dbContext = new InMemoryDbContext(new DbContextOptions<InMemoryDbContext>());
+        var dbContextOptions = new DbContextOptionsBuilder<InMemoryDbContext>()
+            .UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
+        _dbContext = new InMemoryDbContext(dbContextOptions);
         var createTransactionParamsValidator = new CreateTransactionParamsValidator(_dbContext, appSettingsOptsMock.Object);
         _transactionsRepository = new TransactionsRepository(_dbContext, createTransactionParamsValidator);
     }
@@ -72,7 +74,7 @@ public class CreateTransactionTests : IDisposable
         };
         var createTransactionAction = async () =>  await _transactionsRepository.Create(parameters, CancellationToken.None);
 
-        await createTransactionAction.Should().ThrowAsync<ValidationException>();
+        await createTransactionAction.Should().ThrowAsync<StorageOverfullException>();
     }
 
     [Fact]
@@ -98,8 +100,8 @@ public class CreateTransactionTests : IDisposable
         await createTransactionAction.Should().ThrowAsync<DuplicatedEntityException>();
     }
 
-    public async void Dispose()
+    public void Dispose()
     {
-        await _dbContext.DisposeAsync();
+        _dbContext.Dispose();
     }
 }

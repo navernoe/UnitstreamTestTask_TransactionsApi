@@ -11,9 +11,4 @@ public class InMemoryDbContext : DbContext
     }
 
     public DbSet<Transaction> Transactions { get; set; }
-
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        optionsBuilder.UseInMemoryDatabase(Guid.NewGuid().ToString());
-    }
 }
